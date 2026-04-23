@@ -26,15 +26,17 @@ resource "aws_s3_bucket" "demo_bucket" {
   bucket = "jenkins-terraform-demo-${random_integer.suffix.result}"
 }
 
-# Use the default VPC
-data "aws_vpc" "default" {
-  default = true
+# Create a new VPC
+resource "aws_vpc" "demo_vpc" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_support   = true
+  enable_dns_hostnames = true
 }
 
-# Create a subnet inside the default VPC
+# Create a subnet inside the new VPC
 resource "aws_subnet" "public_subnet" {
-  vpc_id            = data.aws_vpc.default.id
-  cidr_block        = "172.31.0.0/20"   # valid range inside default VPC
+  vpc_id            = aws_vpc.demo_vpc.id
+  cidr_block        = "10.0.1.0/24"
   availability_zone = "ap-south-1a"
 }
 
